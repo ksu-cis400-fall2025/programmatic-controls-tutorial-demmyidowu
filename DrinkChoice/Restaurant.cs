@@ -7,12 +7,19 @@ using System.Threading.Tasks;
 
 namespace DrinkChoice
 {
-    public class Restaurant 
+    public class Restaurant : INotifyPropertyChanged
     {
+        public event PropertyChangedEventHandler? PropertyChanged;
+
         public string Name { get; init; }
 
         private List<SodaChoice> _possibleSodas = new List<SodaChoice>();
         public List<SodaChoice> PossibleSodas => _possibleSodas;
+
+        public void OnChosenChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(NumChosen)));
+        }
 
         public Restaurant(string n)
         {
@@ -21,7 +28,12 @@ namespace DrinkChoice
             foreach (SodaType soda in Enum.GetValues(typeof(SodaType)))
             {
                 SodaChoice choice = new SodaChoice(soda);
-                PossibleSodas.Add(new SodaChoice(soda));
+                PossibleSodas.Add(choice);
+            }
+
+            foreach (SodaChoice choice in PossibleSodas)
+            {
+                choice.PropertyChanged += OnChosenChanged;
             }
         }
 
